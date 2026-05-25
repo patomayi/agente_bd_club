@@ -1,0 +1,74 @@
+LISTA COMPLETA DE PREGUNTAS DEL EXAMEN (en castellano)
+Aquí tienes todas las preguntas listas para usar con tu agente:
+
+a)
+Muestra tu nombre como alumno/a usando un SELECT literal.
+select 'Emma' as alumne
+
+select nom,cognom from persona where ciutat is NULL;
+
+b)
+Muestra todas las ciudades donde hay trabajadores del departamento “entrenador”, sin repetir ninguna.
+Usa NATURAL JOIN o un JOIN correcto.
+
+select distinct ciutat from treballador natural join persona where departament = 'entrenador';
+
+c)
+Muestra, para cada comarca, cuántas personas viven en ella.
+Solo muestra las comarcas no nulas.
+
+SELECT COUNT(persona.*) AS personas, comarca FROM persona NATURAL JOIN ciutat WHERE comarca IS NOT NULL GROUP BY comarca;
+
+d)
+Actualiza la ciudad de la persona cuyo correo contiene “ionos”, poniéndole la ciudad “Badalona”.
+Después muestra su nombre y ciudad.
+
+UPDATE persona SET ciutat = 'Badalona' WHERE passaport = (SELECT passaport FROM mails WHERE mail LIKE '%ionos%');
+SELECT nom,ciutat FROM persona NATURAL JOIN mails WHERE mail LIKE '%ionos%';
+
+e)
+Muestra el nombre, apellido, correo y salario base de la persona que vive en Lleida, ordenando por periodo y mostrando solo la primera.
+Usa NATURAL JOIN.
+
+SELECT nom, cognom, mail, sou_base FROM persona NATURAL JOIN mails NATURAL JOIN nomines WHERE ciutat = 'Lleida' ORDER BY periode;
+SELECT nom, cognom, mail, sou_base FROM persona NATURAL JOIN mails NATURAL JOIN nomines WHERE passaport = (SELECT passaport FROM persona
+WHERE ciutat = 'Lleida') ORDER BY periode LIMIT 1;
+
+f)
+Muestra las ciudades que no tienen ninguna persona viviendo en ellas, junto con su número de habitantes.
+Usa LEFT JOIN.
+
+SELECT ciutat, SUM(habitants) AS habitants FROM ciutat NATURAL LEFT JOIN persona WHERE persona.ciutat IS NULL
+GROUP BY ciutat;
+
+g)
+Muestra los correos de personas que practican algún deporte, excepto los que practican fútbol.
+Usa EXCEPT.
+
+SELECT mail FROM mails NATURAL JOIN fa EXCEPT SELECT mail FROM mails NATURAL JOIN fa WHERE esport = 'futbol';
+
+h)
+Muestra el nombre, apellido y departamento de los trabajadores que no obedecen a nadie.
+Usa NATURAL JOIN.
+
+SELECT nom, cognom, departament FROM treballador NATURAL JOIN persona WHERE obeeix IS NULL;
+
+i)
+Muestra las ciudades sin comarca que empiezan por “A”.
+Después elimínalas.
+
+SELECT ciutat, comarca FROM ciutat WHERE comarca IS NULL AND CIUTAT LIKE 'A%';
+DELETE FROM ciutat WHERE ciutat = (SELECT ciutat FROM ciutat WHERE comarca IS NULL AND ciutat 'A%');
+
+j)
+Muestra el pasaporte, nombre, apellido y una columna que diga “SI” si la ciudad es costera y “NO” si no lo es.
+Usa CASE WHEN y NATURAL JOIN.
+
+SELECT p.passaport, p.nom, p.cognom, CASE WHEN c.costanera THEN 'SI' ELSE 'NO' END AS costes FROM persona p NATURAL JOIN ciutat c;
+
+k)
+Crea una vista persona_esports con nombre, apellido y número de deportes que practica cada persona.
+Después muestra la vista.
+
+CREATE VIEW persona_esports AS SELECT nom, cognom, count(fa.*) AS esports FROM persona NATURAL JOIN fa GROUP BY nom, cognom;
+SELECT * FROM persona_esports;

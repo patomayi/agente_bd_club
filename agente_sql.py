@@ -3,81 +3,48 @@ import subprocess
 # ---------------------------------------------------------
 #  ESQUEMA INTELIGENTE INCRUSTADO
 # ---------------------------------------------------------
-ESQUEMA_INTELIGENTE = """
+ESQUEMA = """
 Base de datos: club
 
-Tablas y columnas:
+Tablas:
 
-- ciutat(
-    ciutat PK,
-    habitants,
-    costanera,
-    comarca FK → comarca.comarca
-  )
+ciutat(ciutat PK, habitants, costanera, comarca FK→comarca.comarca)
+comarca(comarca PK)
+persona(passaport PK, nom, cognom, ciutat FK→ciutat.ciutat)
+mails(passaport FK→persona.passaport, mail)
+nomines(passaport FK→treballador.passaport, periode, sou_base, retencio)
+treballador(passaport PK FK→persona.passaport, departament, obeeix FK→treballador.passaport)
+soci(passaport PK FK→persona.passaport, alta)
+fa(passaport FK→soci.passaport, esport FK→esport.esport, quota)
+esport(esport PK, preu, jugadors)
+coneix(coneix FK→persona.passaport, es_coneguda FK→persona.passaport)
 
-- comarca(
-    comarca PK
-  )
+Relaciones importantes:
 
-- persona(
-    passaport PK,
-    nom,
-    cognom,
-    ciutat FK → ciutat.ciutat
-  )
+persona.passaport = mails.passaport
+persona.passaport = treballador.passaport
+treballador.passaport = nomines.passaport
+persona.passaport = soci.passaport
+soci.passaport = fa.passaport
+fa.esport = esport.esport
+persona.ciutat = ciutat.ciutat
+ciutat.comarca = comarca.comarca
 
-- soci(
-    passaport PK FK → persona.passaport,
-    alta
-  )
+Reglas de unión:
 
-- treballador(
-    passaport PK FK → persona.passaport,
-    departament (administració | comercial | entrenador),
-    obeeix FK → treballador.passaport
-  )
+- NATURAL JOIN es válido entre:
+  persona ↔ mails
+  persona ↔ nomines
+  persona ↔ ciutat
 
-- mails(
-    passaport FK → persona.passaport,
-    mail
-  )
+- JOIN ON debe usarse cuando:
+  - los nombres de columnas no coinciden
+  - se requiere LEFT/RIGHT/FULL JOIN
+  - la pregunta lo pida explícitamente
 
-- esport(
-    esport PK,
-    preu,
-    jugadors
-  )
-
-- fa(
-    passaport FK → soci.passaport,
-    esport FK → esport.esport,
-    quota
-  )
-
-- nomines(
-    passaport PK FK → treballador.passaport,
-    periode PK (junto con passaport),
-    sou_base,
-    retencio
-  )
-
-- coneix(
-    coneix FK → persona.passaport,
-    es_coneguda FK → persona.passaport
-  )
-
-Relaciones clave:
-
-- persona.passaport = soci.passaport
-- persona.passaport = treballador.passaport
-- persona.ciutat = ciutat.ciutat
-- ciutat.comarca = comarca.comarca
-- mails.passaport = persona.passaport
-- fa.passaport = soci.passaport
-- fa.esport = esport.esport
-- nomines.passaport = treballador.passaport
-- coneix.coneix / coneix.es_coneguda → persona.passaport
-- treballador.obeeix → treballador.passaport
+- No usar tablas que no sean necesarias.
+- No inventar columnas ni relaciones.
+- La consulta debe ser lo más simple posible.
 """
 
 # ---------------------------------------------------------
@@ -92,18 +59,18 @@ Debes generar consultas SQL usando las tablas en catalán de la base 'club'.
 
 Esquema de la base de datos:
 
-{ESQUEMA_INTELIGENTE}
+{ESQUEMA}
 
 REGLAS IMPORTANTES:
 - Devuelve SOLO una consulta SQL válida.
 - SIN explicaciones.
 - SIN comentarios.
-- SIN texto adicional.
-- NO inventes tablas.
-- NO inventes columnas.
-- Usa NATURAL JOIN solo cuando tenga sentido por columnas comunes.
-- Usa JOIN ... ON correcto cuando haya relaciones explícitas.
-- La consulta debe ser COMPLETA (SELECT ... FROM ... [JOIN ...] [WHERE ...] [GROUP BY ...]).
+- Usa NATURAL JOIN solo cuando sea correcto.
+- Usa JOIN ON cuando sea necesario.
+- Usa LEFT/RIGHT JOIN cuando la pregunta lo pida.
+- No uses tablas innecesarias.
+- No inventes columnas.
+- La consulta debe ser la más corta y simple posible.
 
 Pregunta del usuario:
 {pregunta}
@@ -136,7 +103,7 @@ Pregunta del usuario:
                 break
 
     if not sql:
-        return "XXXXX---No se pudo generar SQL válido.---"
+        return "❌ No se pudo generar SQL válido."
 
     consulta = " ".join(sql)
     if not consulta.endswith(";"):
@@ -146,9 +113,9 @@ Pregunta del usuario:
 
 
 # ---------------------------------------------------------
-#  LOOP PRINCIPAL (solo imprime SQL)
+#  LOOP PRINCIPAL
 # ---------------------------------------------------------
-print("Agente SQL (solo generación de consultas) listo para la base 'club'.")
+print("Agente SQL optimizado listo. Pregunta lo que quieras sobre la base 'club'.")
 print("> ", end="", flush=True)
 
 while True:
