@@ -1,0 +1,8 @@
+.cache/pip/http-v2
+.ssh
+venv/
+.bash_history
+.bashrc
+.lesshst
+.profile
+.psql_history
