@@ -2,39 +2,52 @@
 
 ## English
 
-`agente_bd_club` is a lightweight SQL assistant that translates natural-language questions in Spanish into SQL queries for a PostgreSQL database named `club`.
+`agente_bd_club` is a lightweight SQL assistant that turns natural-language questions into SQL queries for a PostgreSQL database called `club`.
 
-The project contains a Python script that defines the database schema, receives a question from the user, builds a prompt with the schema, and sends it to Ollama so a local LLM can generate the most appropriate SQL statement.
+The project is intentionally simple: it defines the database schema, receives a question from the user, builds a prompt with that schema, and sends it to Ollama so a local language model can generate the most suitable SQL statement.
 
-### What this repo does
+### What the project does
 
-This project is designed to help with SQL learning and database querying by allowing you to ask questions in everyday language instead of writing SQL manually.
+This repository is useful for learning SQL and practicing database queries without manually writing every statement.
 
-It does the following:
+The program:
 
-- defines the schema of the `club` database
-- receives user questions in Spanish
-- uses Ollama and a local model such as `llama3.1`
-- generates a valid SQL query based on the schema
-- prints the SQL in the console for you to use or adapt
+- defines the schema for the `club` database
+- reads a question in Spanish
+- constructs a prompt for the model using the schema
+- calls `ollama run` with a local model such as `llama3.1`
+- extracts and prints the generated SQL in the terminal
 
-This is useful for studying database design, practicing joins, and quickly generating queries from natural language.
+It does not execute the SQL automatically against PostgreSQL; it simply generates the query for the user to review and run.
 
-### Main files
+### Main idea of the implementation
 
-- `agente_sql.py`: main script that generates the SQL
-- `examen.txt`: examples and SQL exercises
-- `volcado.sql`: database dump with the schema and data for the `club` database
-- `venv/`: Python virtual environment if created locally
+The core logic lives in `agente_sql.py`.
+
+The script contains:
+
+- `ESQUEMA`: a text block describing the tables and relationships of the `club` database
+- `generar_sql(pregunta)`: builds a prompt and calls Ollama
+- the main loop: reads input from the user and prints the generated SQL
+
+This is a practical example of a local AI-powered SQL generator using a prompt-driven approach.
+
+### Files in the repository
+
+- `agente_sql.py`: main application logic
+- `examen.txt`: SQL exercises and sample questions
+- `volcado.sql`: database dump containing schema/data for the `club` database
+- `venv/`: local Python virtual environment (if created)
+- `README.md`: project documentation
 
 ### Requirements
 
-Before running it, make sure you have:
+You need:
 
 - Python 3.10 or newer
 - Git
-- Ollama installed and available in your terminal
-- a local model available, such as `llama3.1`
+- Ollama installed and available in the terminal
+- a local model available in Ollama, for example `llama3.1`
 
 ### Installation
 
@@ -82,13 +95,15 @@ Then verify that the `ollama` command works in your terminal.
 ollama pull llama3.1
 ```
 
-If you prefer another model, update this line in `agente_sql.py`:
+If you prefer a different model, change the line inside `agente_sql.py`:
 
 ```python
 subprocess.run(["ollama", "run", "llama3.1"], ...)
 ```
 
-### How to run it
+### How to use it
+
+Run the script:
 
 Linux/macOS:
 
@@ -102,20 +117,13 @@ Windows:
 python agente_sql.py
 ```
 
-You will then see an interactive prompt like:
-
-```text
-Agente SQL optimizado listo. Pregunta lo que quieras sobre la base 'club'.
-> 
-```
-
-You can ask questions such as:
+Then write a question in Spanish, for example:
 
 ```text
 Muestra todas las ciudades donde hay trabajadores del departamento 'entrenador'.
 ```
 
-The script will generate a SQL statement similar to:
+The program will generate a SQL query like:
 
 ```sql
 SELECT DISTINCT ciutat
@@ -123,29 +131,39 @@ FROM treballador NATURAL JOIN persona
 WHERE departament = 'entrenador';
 ```
 
-### Important note
+You can then copy the result and run it in PostgreSQL or another SQL client.
 
-This project generates SQL using a local model, but it does not automatically execute the query in PostgreSQL. Its purpose is:
+### Implementation notes
 
-1. receive a question in Spanish
-2. generate the correct SQL
-3. let the user copy and run it in a database client or environment
+The project is intentionally minimal to be easy to understand and modify.
+
+Core implementation flow:
+
+1. define the schema in `ESQUEMA`
+2. build a natural-language prompt for the model
+3. run the model through `ollama`
+4. parse the output and keep only the SQL query
+5. print the final result
+
+This makes it easy to extend:
+
+- add more tables or relationships
+- support more languages
+- generate different SQL dialects
+- save results to a file
+- add a REST API or web interface
 
 ### Cross-platform compatibility
 
-This project is intended to work on any system where you can install:
+This repo is designed to work on any platform where Python and Ollama are installed.
 
-- Python
-- Ollama
-- a shell or terminal
-
-It is compatible with:
+It works on:
 
 - Linux
 - macOS
 - Windows
 
-As long as Python and Ollama are configured correctly, the project can run with minimal or no code changes.
+As long as the terminal can run Python and the `ollama` command, the project should work without major changes.
 
 ---
 
@@ -153,37 +171,50 @@ As long as Python and Ollama are configured correctly, the project can run with 
 
 `agente_bd_club` es un asistente SQL ligero que convierte preguntas en lenguaje natural en consultas SQL para una base de datos PostgreSQL llamada `club`.
 
-El repositorio contiene un script en Python que define el esquema de la base de datos, recibe una pregunta del usuario, construye un prompt con ese esquema y lo envía a Ollama para que un modelo local genere la sentencia SQL más adecuada.
+El proyecto es sencillo por diseño: define el esquema de la base de datos, recibe una pregunta del usuario, construye un prompt con ese esquema y lo envía a Ollama para que un modelo local genere la sentencia SQL más adecuada.
 
 ### ¿Qué hace este proyecto?
 
-La idea es facilitar el aprendizaje de SQL y la consulta de bases de datos sin tener que escribir cada sentencia manualmente.
+Este repositorio sirve para aprender SQL y practicar consultas de base de datos sin escribir cada sentencia manualmente.
 
-Hace lo siguiente:
+El programa:
 
 - define el esquema de la base de datos `club`
-- recibe preguntas en español
-- usa Ollama con un modelo local como `llama3.1`
-- genera una consulta SQL válida según el esquema
-- muestra la SQL por consola para que puedas usarla o adaptarla
+- lee una pregunta en español
+- construye un prompt para el modelo usando el esquema
+- llama a `ollama run` con un modelo local como `llama3.1`
+- extrae e imprime la SQL generada en la terminal
 
-Es útil para estudiar diseño de bases de datos, practicar joins y generar consultas rápidamente a partir de lenguaje natural.
+No ejecuta la consulta automáticamente contra PostgreSQL; solo genera la SQL para que el usuario la revise y la ejecute.
 
-### Archivos principales
+### Idea principal de la implementación
 
-- `agente_sql.py`: script principal del agente SQL
-- `examen.txt`: ejemplos y ejercicios de SQL
-- `volcado.sql`: volcado de la base de datos con el esquema y datos de `club`
+La lógica principal está en `agente_sql.py`.
+
+El script contiene:
+
+- `ESQUEMA`: un bloque de texto con las tablas y relaciones de la base `club`
+- `generar_sql(pregunta)`: crea el prompt y llama a Ollama
+- el bucle principal: lee la entrada del usuario y muestra la SQL generada
+
+Es un ejemplo práctico de generador de SQL con IA local usando prompts.
+
+### Archivos del repositorio
+
+- `agente_sql.py`: lógica principal de la aplicación
+- `examen.txt`: ejercicios y preguntas de ejemplo
+- `volcado.sql`: volcado de la base de datos con esquema y datos
 - `venv/`: entorno virtual de Python si se crea localmente
+- `README.md`: documentación del proyecto
 
 ### Requisitos
 
-Antes de ejecutarlo, necesitas:
+Necesitas:
 
 - Python 3.10 o superior
 - Git
-- Ollama instalado y funcionando
-- un modelo local disponible, por ejemplo `llama3.1`
+- Ollama instalado y disponible en la terminal
+- un modelo local disponible en Ollama, por ejemplo `llama3.1`
 
 ### Instalación
 
@@ -196,21 +227,21 @@ cd agente_bd_club
 
 #### 2) Crea un entorno virtual
 
-En Linux/macOS:
+Linux/macOS:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-En Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
-En Windows CMD:
+Windows CMD:
 
 ```cmd
 python -m venv venv
@@ -223,7 +254,7 @@ Descárgalo desde:
 
 - https://ollama.com/
 
-Y asegúrate de que el comando `ollama` esté disponible en tu terminal.
+Y comprueba que el comando `ollama` funcione en tu terminal.
 
 #### 4) Descarga un modelo
 
@@ -231,40 +262,35 @@ Y asegúrate de que el comando `ollama` esté disponible en tu terminal.
 ollama pull llama3.1
 ```
 
-Si prefieres otro modelo, cambia esta línea en `agente_sql.py`:
+Si prefieres otro modelo, cambia esta línea dentro de `agente_sql.py`:
 
 ```python
 subprocess.run(["ollama", "run", "llama3.1"], ...)
 ```
 
-### Cómo ejecutarlo
+### Cómo usarlo
 
-En Linux/macOS:
+Ejecuta el script:
+
+Linux/macOS:
 
 ```bash
 python3 agente_sql.py
 ```
 
-En Windows:
+Windows:
 
 ```powershell
 python agente_sql.py
 ```
 
-A continuación verás un prompt interactivo:
-
-```text
-Agente SQL optimizado listo. Pregunta lo que quieras sobre la base 'club'.
-> 
-```
-
-Puedes hacer preguntas como:
+Luego escribe una pregunta en español, por ejemplo:
 
 ```text
 Muestra todas las ciudades donde hay trabajadores del departamento 'entrenador'.
 ```
 
-Y el programa generará una sentencia SQL similar a:
+El programa generará una consulta SQL parecida a:
 
 ```sql
 SELECT DISTINCT ciutat
@@ -272,32 +298,48 @@ FROM treballador NATURAL JOIN persona
 WHERE departament = 'entrenador';
 ```
 
-### Importante
+Después puedes copiar el resultado y ejecutarlo en PostgreSQL o en un cliente SQL.
 
-Este proyecto genera SQL usando un modelo local, pero no ejecuta automáticamente la consulta en PostgreSQL. La intención es:
+### Notas de implementación
 
-1. hacer la pregunta en español
-2. generar la SQL correcta
-3. dejar que el usuario la copie y la ejecute en un cliente o entorno de base de datos
+El proyecto está pensado para ser simple y fácil de entender y ampliar.
+
+Flujo de implementación:
+
+1. definir el esquema en `ESQUEMA`
+2. construir un prompt con lenguaje natural
+3. ejecutar el modelo con `ollama`
+4. analizar la salida y conservar solo la SQL
+5. imprimir el resultado final
+
+Esto permite ampliarlo fácilmente con:
+
+- más tablas o relaciones
+- más idiomas
+- otros dialectos SQL
+- guardado de consultas en archivo
+- API REST o interfaz web
 
 ### Compatibilidad multiplataforma
 
-El repositorio está pensado para funcionar en cualquier sistema donde puedas instalar:
+Este repositorio está pensado para funcionar en cualquier plataforma donde tengas Python y Ollama instalados.
 
-- Python
-- Ollama
-- una terminal o shell
-
-Por eso es compatible con:
+Funciona en:
 
 - Linux
 - macOS
 - Windows
 
-Siempre que Python y Ollama estén bien configurados, el proyecto puede ejecutarse sin cambios importantes en el código.
+Mientras la terminal pueda ejecutar Python y el comando `ollama`, el proyecto debería funcionar sin cambios importantes.
 
-## Nota final
+## Resumen
 
-Este repositorio es una herramienta educativa y práctica para trabajar con SQL y modelos de IA locales. Sirve tanto para aprender consultas como para experimentar con la generación automática de SQL a partir de lenguaje natural.
+Este proyecto es una base simple pero útil para generar consultas SQL desde lenguaje natural usando IA local. Es ideal para aprendizaje, prototipos, y experimentación con modelos locales de generación SQL.
 
-Puedes probarlo con los ejemplos incluidos en `examen.txt` o importar el esquema de `volcado.sql` en una base PostgreSQL para ejecutar las consultas generadas.
+Puedes usarlo como punto de partida para crear un agente más avanzado que además:
+
+- ejecute la SQL de forma automática
+- conecte con PostgreSQL directamente
+- guarde historial de consultas
+- cree una interfaz web o API
+- soporte más preguntas y más esquemas de base de datos
